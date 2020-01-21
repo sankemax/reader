@@ -3,16 +3,16 @@
 	"description": "Feed reading and aggregating for Node.",
 	"author": "Dave Winer <dave@smallpicture.com>",
 	"license": "MIT",
-	"version": "0.6.10", 
+	"version": "0.6.10",
 	"main": "davereader.js",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/scripting/reader.git"
-		},
+	},
 	"files": [
 		"davereader.js"
-		],
-	"dependencies" : {
+	],
+	"dependencies": {
 		"daveutils": "*",
 		"request": "*",
 		"mime": "*",
@@ -21,5 +21,5 @@
 		"opmlparser": "*",
 		"feedparser": "*",
 		"davefeedread": "*"
-		} 
 	}
+}

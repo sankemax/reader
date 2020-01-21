@@ -1,25 +1,26 @@
-const reader = require ("davereader");
-const utils = require ("daveutils");
-const fs = require ("fs");
+const reader = require("davereader");
+const utils = require("daveutils");
+const fs = require("fs");
+const EventEmitter = require('events');
+const emitter = new EventEmitter();
 
 const readerDataFolder = "reader_data/";
-const myOutputFolder = "myOutputFolder/";
 
 var config = {
 	flHttpEnabled: false,
 	flWebSocketEnabled: false,
-	
+
 	listsFolder: readerDataFolder + "lists/",
 	riversFolder: readerDataFolder + "rivers/",
-	podcastsFolder: readerDataFolder + "podcasts/", 
+	podcastsFolder: readerDataFolder + "podcasts/",
 	dataFolder: readerDataFolder + "data/",
-	
+
 	addToRiverCallbacksFolder: readerDataFolder + "callbacks/addToRiver/",
 	buildRiverCallbacksFolder: readerDataFolder + "callbacks/buildRiver/",
-	
-	flRequestCloudNotify: false, 
+
+	flRequestCloudNotify: false,
 	flDownloadPodcasts: false
-	};
+};
 
 var feeds = [
 	"http://scripting.com/rss.xml",
@@ -31,30 +32,33 @@ var feeds = [
 	"http://www.nytimes.com/pages/technology/index.html?partner=rssnyt",
 	"http://hn.geekity.com/newstories.xml",
 	"http://www.npr.org/rss/rss.php?id=1045"
-	];
-function writeFeedsList (callback) { 
-	var f = readerDataFolder + "lists/feeds.json", jsontext = utils.jsonStringify (feeds);
-	utils.sureFilePath (f, function () {
-		fs.writeFile (f, jsontext, function (err) {
-			if (err) {
-				console.log ("writeFeedsList: err.message == " + err.message);
-				}
-			else {
-				callback ();
-				}
-			});
-		});
-	}
+];
 
-function startup () {
-	config.newItemCallback = function (urlfeed, itemFromParser, item) { //called for each new item
-		var f = myOutputFolder + utils.getDatePath () + utils.padWithZeros (item.id, 4) + ".json";
-		utils.sureFilePath (f, function () {
-			fs.writeFile (f, utils.jsonStringify (item))
-			});
-		};
-	writeFeedsList (function () {
-		reader.init (config);
+function writeFeedsList(callback) {
+	var f = readerDataFolder + "lists/feeds.json", jsontext = utils.jsonStringify(feeds);
+	utils.sureFilePath(f, function () {
+		fs.writeFile(f, jsontext, function (err) {
+			if (err) {
+				console.log("writeFeedsList: err.message == " + err.message);
+			}
+			else {
+				callback();
+			}
 		});
-	}
-startup ();
+	});
+}
+
+function startup() {
+	config.newItemCallback = function (urlfeed, itemFromParser, item) {
+		emitter.emit('newItem', item);
+	};
+	writeFeedsList(function () {
+		reader.init(config);
+	});
+}
+
+emitter.on('newItem', item => {
+	console.log(item);
+})
+
+startup();
